@@ -35,5 +35,5 @@ public abstract class DetectorEnfermedadesActivity extends AppCompatActivity {
 
 
 
-    
+
 }

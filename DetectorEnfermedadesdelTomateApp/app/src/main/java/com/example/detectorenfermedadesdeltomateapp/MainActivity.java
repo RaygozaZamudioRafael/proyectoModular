@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
+import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -152,8 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 resultado.setText(classes[maxPos]);
             }
             else{
-                resultado.setText(classes[maxPos]);
-                //classifyImage2(image); //Esto es para una segunda clase cuando detecta la enfermedad
+                classifyImage2(image); //Esto es para una segunda clase cuando detecta la enfermedad
             }
 
             // Releases model resources if no longer used.
@@ -162,6 +162,66 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+
+    public void classifyImage2(Bitmap image){
+        try {
+            ModeloDetectorEnfermedadV320006 model = ModeloDetectorEnfermedadV320006.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV320006.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+            float[] confidences = outputFeature0.getFloatArray();
+            int maxPos = 0;
+            float maxConfidence = 0;
+            for (int i = 0; i < confidences.length; i++) {
+                if (confidences[i] > maxConfidence) {
+                    maxConfidence = confidences[i];
+                    maxPos = i;
+                }
+            }
+
+            String[] classes =  {
+                    "Acaros",
+                    "Moho_de_hoja",
+                    "Moho_polvoriento",
+                    "Plaga",
+                    "Puntos_de_hoja",
+                    "Virus_del_tomate"
+            };
+            //----------------------------------
+            resultado.setText(classes[maxPos]);
+            //------------------------------
+
+            // Releases model resources if no longer used.
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
     }
 
 }

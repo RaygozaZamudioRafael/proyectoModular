@@ -1,7 +1,5 @@
 package com.example.detectorenfermedadesdeltomateapp;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;

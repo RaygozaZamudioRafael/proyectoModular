@@ -15,8 +15,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
@@ -31,9 +33,11 @@ import java.nio.ByteOrder;
 public class MainActivity extends AppCompatActivity {
 
     //Declaracion variables
-    Button camara, galeria;
+    Button camara, galeria, descripcion;
     ImageView imageView;
     TextView resultado;
+
+
 
     int TAMANIO_IMAGEN = 224;
 
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         camara  = findViewById(R.id.ma_Foto);
         galeria = findViewById(R.id.ma_Galeria);
+        descripcion = findViewById(R.id.ma_BTNmostrarDescripcion);
 
         resultado   = findViewById(R.id.ma_resultado);
         imageView   = findViewById(R.id.ma_Imagen);
@@ -71,7 +76,23 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        descripcion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(resultado.getText().equals("")){
+                    Toast.makeText(getApplicationContext(), "Se requiere analizar una foto primero", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Intent senderIntent = new Intent(getApplicationContext(),DescripcionEnfermedad.class);
+                    senderIntent.putExtra("KEY_SENDER", resultado.getText().toString());
+                    startActivity(senderIntent);
+                    //finish();
+                }
+            }
+        });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode == RESULT_OK){
@@ -206,10 +227,10 @@ public class MainActivity extends AppCompatActivity {
 
             String[] classes =  {
                     "Acaros",
-                    "Moho_de_hoja",
-                    "Moho_polvoriento",
+                    "Moho de hoja",
+                    "Moho polvoriento",
                     "Plaga",
-                    "Puntos_de_hoja",
+                    "Moho de hoja",//Puntos de hoja
                     "Virus_del_tomate"
             };
             //----------------------------------

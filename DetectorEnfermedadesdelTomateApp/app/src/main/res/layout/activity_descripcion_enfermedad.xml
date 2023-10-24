@@ -8,24 +8,20 @@
     tools:context=".DescripcionEnfermedad">
 
 
-    <ScrollView
-        android:id="@+id/tvTratameinto"
-        android:layout_width="369dp"
-        android:layout_height="214dp"
-        android:layout_marginTop="32dp"
-        android:scrollbarStyle="insideInset"
-        android:text=""
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/txtTratamiento"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="Descripción"
+        android:textColor="#C30000"
+        android:textSize="12sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text2"
-        app:layout_constraintVertical_bias="0.0">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@+id/text2" />
 
     <TextView
         android:id="@+id/De_Enfermedad"
@@ -61,32 +57,36 @@
         app:layout_constraintVertical_bias="0.035" />
 
     <TextView
+        android:id="@+id/txtDescripcion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_centerHorizontal="true"
+        android:text="Descripción"
+        android:textColor="#C30000"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Texto1"
+        app:layout_constraintVertical_bias="0.028" />
+
+    <TextView
         android:id="@+id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="176dp"
         android:text="Tratamiento y Sugerencias"
         android:textColor="#C30000"
         android:textSize="27sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescripcionEnfermedad" />
-
-    <ScrollView
-        android:id="@+id/tvDescripcionEnfermedad"
-        android:layout_width="369dp"
-        android:layout_height="214dp"
-        android:scrollbarStyle="insideInset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Texto1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@+id/txtDescripcion" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

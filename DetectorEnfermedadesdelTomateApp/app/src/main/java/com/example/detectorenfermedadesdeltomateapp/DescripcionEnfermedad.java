@@ -35,30 +35,47 @@ public class DescripcionEnfermedad extends AppCompatActivity {
 
     }
 
-    @SuppressLint("WrongViewCast")
+    @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     public void updateInfo(){
         setContentView(R.layout.activity_descripcion_enfermedad);
         textView = findViewById(R.id.De_Enfermedad);
-        descripcion = findViewById(R.id.tvDescripcionEnfermedad);
-        tratamiento = findViewById(R.id.tvTratameinto);
         Intent intent = getIntent();
         String intentValue = intent.getStringExtra("KEY_SENDER");
         textView.setText(intentValue);
-
+        descripcion = findViewById(R.id.txtDescripcion);
+        tratamiento = findViewById(R.id.txtTratamiento);
         String url = "http://192.168.100.9/Fetch/fetchEnfermedad.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST,url,
-            response -> Toast.makeText(this, response.toString(), Toast.LENGTH_SHORT).show(),
+            response -> tratamiento.setText(response),
             error -> Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show()
+
         ){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 params.put("enfermedadNombre","Moho de hoja");
+                params.put("tipoPeticion","descripcionEnfermedad");
                 return params;
             }
         };
+
+        StringRequest stringRequest2 = new StringRequest(Request.Method.POST,url,
+                response -> descripcion.setText(response),
+                error -> Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show()
+
+        ){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("enfermedadNombre","Moho de hoja");
+                params.put("tipoPeticion","tratamientoSugerido");
+                return params;
+            }
+        };
+
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+        requestQueue.add(stringRequest2);
 
     }
 

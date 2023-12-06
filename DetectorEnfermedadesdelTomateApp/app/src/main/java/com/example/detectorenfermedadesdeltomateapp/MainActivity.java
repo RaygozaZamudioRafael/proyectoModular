@@ -33,7 +33,7 @@ import java.nio.ByteOrder;
 public class MainActivity extends AppCompatActivity {
 
     //Declaracion variables
-    Button camara, galeria, descripcion;
+    Button camara, galeria, descripcion, registro;
     ImageView imageView;
     TextView resultado;
 
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         camara  = findViewById(R.id.ma_Foto);
         galeria = findViewById(R.id.ma_Galeria);
         descripcion = findViewById(R.id.ma_BTNmostrarDescripcion);
+        registro = findViewById(R.id.ma_login);
 
         resultado   = findViewById(R.id.ma_resultado);
         imageView   = findViewById(R.id.ma_Imagen);
@@ -73,6 +74,16 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent cameraIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     startActivityForResult(cameraIntent,1);
+
+            }
+        });
+
+        registro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent registroIntent = new Intent(getApplicationContext(), login.class);
+                startActivity(registroIntent);
 
             }
         });

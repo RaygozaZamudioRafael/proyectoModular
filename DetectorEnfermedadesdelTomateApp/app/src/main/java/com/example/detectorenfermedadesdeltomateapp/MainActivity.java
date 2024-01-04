@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         camara  = findViewById(R.id.ma_Foto);
         galeria = findViewById(R.id.ma_Galeria);
         descripcion = findViewById(R.id.ma_BTNmostrarDescripcion);
-        registro = findViewById(R.id.ma_login);
+        //registro = findViewById(R.id.ma_login);
 
         resultado   = findViewById(R.id.ma_resultado);
         imageView   = findViewById(R.id.ma_Imagen);

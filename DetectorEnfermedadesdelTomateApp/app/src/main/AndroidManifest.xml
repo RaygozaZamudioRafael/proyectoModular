@@ -46,7 +46,9 @@
         <activity
             android:name=".SplashActivity"
             android:exported="false"
-            android:theme="@style/Theme.Design.NoActionBar"></activity>
+            android:theme="@style/Theme.Design.Light">
+
+        </activity>
     </application>
 
 </manifest>

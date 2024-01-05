@@ -13,12 +13,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         camara  = findViewById(R.id.ma_Foto);
         galeria = findViewById(R.id.ma_Galeria);
@@ -78,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        registro.setOnClickListener(new View.OnClickListener() {
+        /*registro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -87,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+*/
         descripcion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_menu, menu);
+        return true;
     }
 
     @Override

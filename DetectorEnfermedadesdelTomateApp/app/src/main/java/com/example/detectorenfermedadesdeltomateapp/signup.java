@@ -81,6 +81,9 @@ public class signup extends AppCompatActivity {
                                     if(result.equals("Sign Up Success")){
                                         Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(getApplicationContext(),login.class);
+
+                                        salvarUsuarioLocal(username, password,email);
+
                                         startActivity(intent);
                                         finish();
                                     }
@@ -105,6 +108,14 @@ public class signup extends AppCompatActivity {
 
 
 
+
+    }
+
+    private void salvarUsuarioLocal(String Username, String Password, String Email) {
+
+
+
+        Usuario usuario = new Usuario(Username, Password, Email);
 
     }
 }

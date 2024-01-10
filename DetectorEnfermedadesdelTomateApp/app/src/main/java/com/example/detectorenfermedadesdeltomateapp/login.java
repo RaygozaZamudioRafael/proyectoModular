@@ -22,6 +22,8 @@ public class login extends AppCompatActivity {
     TextView textViewSingUp;
     ProgressBar progressBar;
 
+    UsuarioLocalAlmacenado loginULA;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,8 @@ public class login extends AppCompatActivity {
         textViewSingUp = findViewById(R.id.signup_text);
         buttonSingIn = findViewById(R.id.button_login);
         progressBar = findViewById(R.id.progress_bar_login);
+
+        loginULA = new UsuarioLocalAlmacenado(this);
 
         textViewSingUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +76,7 @@ public class login extends AppCompatActivity {
                                     String result = putData.getResult();
                                     if(result.equals("Login Success")){
                                         Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+                                        salvarUsuarioLocal();
                                         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                                         startActivity(intent);
                                         finish();
@@ -92,6 +97,19 @@ public class login extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void salvarUsuarioLocal() {
+        //Actualizar el metodo de login y la forma que toma datos de la base de datos para que regrese la informacion y poder almacenar
+        //el correo y demas datos
+        Usuario user = new Usuario(
+                                   String.valueOf(textInputEditTextUsername.getText()),
+                                   String.valueOf(textInputEditTextPassword.getText()),
+                             null);
+
+        loginULA.storeUserData(user);
+        loginULA.setLoggInUser(true);
 
     }
 }

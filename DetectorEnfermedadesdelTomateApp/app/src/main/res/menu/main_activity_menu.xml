@@ -8,6 +8,10 @@
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/objeto2"
-        android:title="Objeto 2"
+        android:title="Mapa epidemiologico"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/logOut"
+        android:title="LogOut"
         app:showAsAction="never"/>
 </menu>

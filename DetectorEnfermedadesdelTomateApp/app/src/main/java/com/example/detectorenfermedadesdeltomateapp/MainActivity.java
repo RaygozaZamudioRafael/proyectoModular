@@ -1,5 +1,8 @@
 package com.example.detectorenfermedadesdeltomateapp;
 
+import static com.example.detectorenfermedadesdeltomateapp.R.*;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -15,6 +18,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
     //Declaracion variables
     Button camara, galeria, descripcion, registro;
     ImageView imageView;
-    TextView resultado;
+    TextView resultado,username;
+
+    UsuarioLocalAlmacenado mainActivityULA;
 
 
 
@@ -49,18 +55,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(id.toolbar);
         setSupportActionBar(toolbar);
 
-        camara  = findViewById(R.id.ma_Foto);
-        galeria = findViewById(R.id.ma_Galeria);
-        descripcion = findViewById(R.id.ma_BTNmostrarDescripcion);
-        //registro = findViewById(R.id.ma_login);
+        mainActivityULA = new UsuarioLocalAlmacenado(this);
 
-        resultado   = findViewById(R.id.ma_resultado);
-        imageView   = findViewById(R.id.ma_Imagen);
+        camara  = findViewById(id.ma_Foto);
+        galeria = findViewById(id.ma_Galeria);
+        descripcion = findViewById(id.ma_BTNmostrarDescripcion);
+        registro = findViewById(id.ma_AnalisisServidor);
+
+        resultado   = findViewById(id.ma_resultado);
+        imageView   = findViewById(id.ma_Imagen);
+        username    = findViewById(id.textViewUsuario);
 
         camara.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +92,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        registro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                mainActivityULA.clearUserData();
+
+            }
+        });
+
 
         /*registro.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,11 +130,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(autentificacion() == true){
+            Usuario usuario = mainActivityULA.getLoggInUser();
+            username.setText(usuario.username);
+
+        }
+        else{
+            Intent intent = new Intent(getApplicationContext(),login.class);
+            startActivity(intent);
+            finish();
+        }
+
+    }
+
+    private  boolean autentificacion(){
+        return mainActivityULA.getAuthLogInUser();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_activity_menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+        if(id == R.id.objeto1){
+            Toast.makeText(this,"You clicked Opcion1",Toast.LENGTH_LONG).show();
+        } else if (id == R.id.objeto2) {
+            Toast.makeText(this,"You clicked Opcion2",Toast.LENGTH_LONG).show();
+        } else if (id == R.id.logOut) {
+            Toast.makeText(this,"You clicked LogOut",Toast.LENGTH_LONG).show();
+            mainActivityULA.clearUserData();
+            Intent intent = new Intent(getApplicationContext(),login.class);
+            startActivity(intent);
+            finish();
+        }
+        else{
+
+        }
+            return super.onOptionsItemSelected(item);
+    }
+    //AGREGAR BOTON LOGOUT DENTRO DEL MENU Y RECORDAR LIMPIAR EL ALMACENAMIENTO LOCARL DEL USUARIO.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

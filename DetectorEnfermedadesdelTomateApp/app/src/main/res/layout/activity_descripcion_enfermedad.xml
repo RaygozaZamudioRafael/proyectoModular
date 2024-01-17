@@ -62,6 +62,10 @@
         android:layout_height="wrap_content"
 
         android:layout_centerHorizontal="true"
+        android:layout_marginHorizontal="20px"
+        android:justificationMode="inter_word"
+        android:paddingStart="20px"
+        android:paddingEnd="20px"
         android:text="Descripción"
         android:textColor="#C30000"
         android:textSize="12sp"

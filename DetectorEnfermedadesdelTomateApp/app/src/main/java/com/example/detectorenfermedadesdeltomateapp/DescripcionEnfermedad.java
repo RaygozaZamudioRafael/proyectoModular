@@ -44,7 +44,7 @@ public class DescripcionEnfermedad extends AppCompatActivity {
         textView.setText(intentValue);
         descripcion = findViewById(R.id.txtDescripcion);
         tratamiento = findViewById(R.id.txtTratamiento);
-        String url = "http://192.168.100.9/Fetch/fetchEnfermedad.php";
+        String url = "http://192.168.100.12/Fetch/fetchEnfermedad.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST,url,
             response -> tratamiento.setText(response),
             error -> Toast.makeText(this,"Error",Toast.LENGTH_SHORT).show()
@@ -54,7 +54,7 @@ public class DescripcionEnfermedad extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 params.put("enfermedadNombre","Moho de hoja");
-                params.put("tipoPeticion","descripcionEnfermedad");
+                params.put("tipoPeticion","tratamientoSugerido");
                 return params;
             }
         };
@@ -68,7 +68,7 @@ public class DescripcionEnfermedad extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> params = new HashMap<>();
                 params.put("enfermedadNombre","Moho de hoja");
-                params.put("tipoPeticion","tratamientoSugerido");
+                params.put("tipoPeticion","descripcionEnfermedad");
                 return params;
             }
         };

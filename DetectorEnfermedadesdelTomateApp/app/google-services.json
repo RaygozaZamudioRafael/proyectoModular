@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "177259644328",
+    "project_id": "detectorenfermedadesdeltomate",
+    "storage_bucket": "detectorenfermedadesdeltomate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177259644328:android:8cb02be0e6e611f5a7099d",
+        "android_client_info": {
+          "package_name": "com.example.detectorenfermedadesdeltomateapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb3X3lJWGR-AFMdqVBuEzq2UWZUMaWap8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

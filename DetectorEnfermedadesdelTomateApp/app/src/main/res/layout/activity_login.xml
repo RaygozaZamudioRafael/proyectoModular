@@ -45,11 +45,11 @@
 
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/login_user_name"
+            android:id="@+id/login_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:hint="user_name"
+            android:hint="Email"
             android:inputType="textPersonName"
             android:padding="15dp" />
 

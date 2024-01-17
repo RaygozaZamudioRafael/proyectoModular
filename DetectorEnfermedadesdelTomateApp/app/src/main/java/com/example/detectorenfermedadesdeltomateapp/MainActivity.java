@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         if(autentificacion() == true){
             Usuario usuario = mainActivityULA.getLoggInUser();
-            username.setText(usuario.username);
+            username.setText(usuario.email);
 
         }
         else{

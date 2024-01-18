@@ -29,6 +29,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     UsuarioLocalAlmacenado mainActivityULA;
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    DocumentReference docRef = db.collection("usuarios").document("SF");
 
 
     int TAMANIO_IMAGEN = 224;
@@ -70,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         resultado   = findViewById(id.ma_resultado);
         imageView   = findViewById(id.ma_Imagen);
         username    = findViewById(id.textViewUsuario);
+
+
+
+
 
         camara.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,12 +141,36 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
     @Override
     protected void onStart() {
         super.onStart();
         if(autentificacion() == true){
             Usuario usuario = mainActivityULA.getLoggInUser();
             username.setText(usuario.email);
+
+            db.collection("usuarios")
+                    .whereEqualTo("email", usuario.email)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    usuario.username = document.getId();
+                                    //usuario.username = document.getString("userName");
+                                    username.setText(usuario.username);
+                                }
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Error al recuperar datos", Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    });
 
         }
         else{

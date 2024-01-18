@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     UsuarioLocalAlmacenado mainActivityULA;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    DocumentReference docRef = db.collection("usuarios").document("SF");
 
 
     int TAMANIO_IMAGEN = 224;

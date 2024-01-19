@@ -7,7 +7,7 @@
         android:title="Objeto 1"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/objeto2"
+        android:id="@+id/mapaEpidemiologico"
         android:title="Mapa epidemiologico"
         app:showAsAction="never"/>
     <item

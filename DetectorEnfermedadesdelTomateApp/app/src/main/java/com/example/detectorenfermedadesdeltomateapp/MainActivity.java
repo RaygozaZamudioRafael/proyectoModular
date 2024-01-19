@@ -45,6 +45,7 @@ import java.nio.ByteOrder;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int MY_PERMISSIONS_REQUEST;
     //Declaracion variables
     Button camara, galeria, descripcion, registro;
     ImageView imageView;
@@ -145,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        obtenerPermisos();
+
         if(autentificacion() == true){
             Usuario usuario = mainActivityULA.getLoggInUser();
             username.setText(usuario.email);
@@ -180,6 +184,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void obtenerPermisos() {
+
+        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+    }
+
     private  boolean autentificacion(){
         return mainActivityULA.getAuthLogInUser();
     }
@@ -197,8 +213,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.objeto1){
             Toast.makeText(this,"You clicked Opcion1",Toast.LENGTH_LONG).show();
-        } else if (id == R.id.objeto2) {
-            Toast.makeText(this,"You clicked Opcion2",Toast.LENGTH_LONG).show();
+        } else if (id == R.id.mapaEpidemiologico) {
+            Toast.makeText(this,"You clicked mapaEpidemiologico",Toast.LENGTH_LONG).show();
+            Intent senderIntent = new Intent(getApplicationContext(),MapaEpidemiologico.class);
+            startActivity(senderIntent);
         } else if (id == R.id.logOut) {
             Toast.makeText(this,"You clicked LogOut",Toast.LENGTH_LONG).show();
             mainActivityULA.clearUserData();

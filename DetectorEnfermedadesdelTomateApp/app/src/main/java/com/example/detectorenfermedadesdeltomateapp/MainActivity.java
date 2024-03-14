@@ -13,10 +13,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationRequest;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -34,8 +37,13 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV10007;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
+import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV60007;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Granularity;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -63,7 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
     private int MY_PERMISSIONS_REQUEST;
 
-    private FusedLocationProviderClient fusedLocationClient;
+    FusedLocationProviderClient fusedLocationClient;
+
+    //LocationRequest locationRequest;
 
     //Declaracion variables
     Button camara, galeria, descripcion, registro;
@@ -95,11 +105,11 @@ public class MainActivity extends AppCompatActivity {
         galeria = findViewById(id.ma_Galeria);
         descripcion = findViewById(id.ma_BTNmostrarDescripcion);
         registro = findViewById(id.ma_AnalisisServidor);
-        prueba = findViewById(id.prueba);
-        prueba2 = findViewById(id.prueba2);
+        //prueba = findViewById(id.prueba);
+        //prueba2 = findViewById(id.prueba2);
 
         resultado = findViewById(id.ma_resultado);
-        resultado2 = findViewById(id.ma_resultado2);
+        //resultado2 = findViewById(id.ma_resultado2);
         imageView = findViewById(id.ma_Imagen);
         username = findViewById(id.textViewUsuario);
 
@@ -253,6 +263,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void subirReporteEnfermedad() {
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                Log.d("demo","onLocationResult: " + locationResult);
+            }
+        };
 
         Toast.makeText(getApplicationContext(), "Registro iniciado", Toast.LENGTH_SHORT).show();
         Map<String, Object> map = new HashMap<>();
@@ -263,15 +280,25 @@ public class MainActivity extends AppCompatActivity {
 
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            obtenerPermisos();
             return;
         }
+        lm.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                    }
+                    @Override
+                    public void onProviderEnabled(String provider) {
+                    }
+                    @Override
+                    public void onProviderDisabled(String provider) {
+                    }
+                    @Override
+                    public void onLocationChanged(final Location location) {
+                    }
+                });
+
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         //ArrayList<Double> latLong = new ArrayList<>();
         GeoPoint latLong;
@@ -307,8 +334,7 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(image);
 
                 image = Bitmap.createScaledBitmap(image, TAMANIO_IMAGEN, TAMANIO_IMAGEN, true);
-                classifyImage2(image);
-                classifyImage3(image);
+                clasificarImagenEnsamble(image);
             }else{
                 Uri dat = data.getData();
                 Bitmap image = null;
@@ -320,14 +346,162 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(image);
 
                 image = Bitmap.createScaledBitmap(image, TAMANIO_IMAGEN, TAMANIO_IMAGEN, false);
-                classifyImage2(image);
-                classifyImage3(image);
+
+                clasificarImagenEnsamble(image);
             }
         }
 
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
+
+    public void clasificarImagenEnsamble(Bitmap image){
+
+        float[] confidences0 = new float[6],confidences1 = new float[6],confidences2 = new float[6];
+        int maxPos = 0;
+        float maxConfidence = 0;
+
+        try {
+            ModeloDetectorEnfermedadV320006 model = ModeloDetectorEnfermedadV320006.newInstance(getApplicationContext());
+            ModeloDetectorEnfermedadV60007 model3 = ModeloDetectorEnfermedadV60007.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV320006.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+            //pruebaTexto = "Prueba: "+ "\n";
+
+
+            confidences0 = outputFeature0.getFloatArray();
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+        try {
+            ModeloDetectorEnfermedadV10007 model = ModeloDetectorEnfermedadV10007.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV10007.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+            confidences1 = outputFeature0.getFloatArray();
+
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+        try {
+            ModeloDetectorEnfermedadV60007 model = ModeloDetectorEnfermedadV60007.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV60007.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+            confidences2 = outputFeature0.getFloatArray();
+
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+        //Sumar las confidencias para sacar la media
+
+        for (int i = 0; i < confidences0.length; i++) {
+            confidences0[i] = confidences0[i] + confidences1[i] + confidences2[i];
+        }
+
+        //sacar mayor confidencia y comparar el resultado
+        for (int i = 0; i < confidences0.length; i++) {
+            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
+            if (confidences0[i] > maxConfidence) {
+                maxConfidence = confidences0[i];
+                maxPos = i;
+                //prueba.setText(pruebaTexto);
+            }
+            //prueba.setText(pruebaTexto);
+        }
+        String[] classes =  {
+                "Acaros",
+                "Moho de hoja",
+                "Moho polvoriento",
+                "Plaga",
+                "Puntos de hoja",//Puntos de hoja
+                "Virus del tomate"
+        };
+        //----------------------------------
+        resultado.setText(classes[maxPos]);
+        //------------------------------
+    }
+/*
+
 
     public void clasificarImagen(Bitmap image) {
         try {
@@ -395,72 +569,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void classifyImage2(Bitmap image){
-        try {
-            ModeloDetectorEnfermedadV320006 model = ModeloDetectorEnfermedadV320006.newInstance(getApplicationContext());
-
-            // Creates inputs for reference.
-            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
-
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
-            byteBuffer.order(ByteOrder.nativeOrder());
-
-            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
-            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
-            int pixel = 0;
-
-            for(int i = 0; i<TAMANIO_IMAGEN; i++){
-                for(int j = 0; j< TAMANIO_IMAGEN; j++){
-                    int val = intValues[pixel++]; // RGB
-                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
-                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
-                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
-                }
-            }
-
-            inputFeature0.loadBuffer(byteBuffer);
-
-            // Runs model inference and gets result.
-            ModeloDetectorEnfermedadV320006.Outputs outputs = model.process(inputFeature0);
-            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
-            pruebaTexto = "Prueba: "+ "\n";
-            float[] confidences = outputFeature0.getFloatArray();
-            int maxPos = 0;
-            float maxConfidence = 0;
-            float a,b;
-
-            for (int i = 0; i < confidences.length; i++) {
-                pruebaTexto = pruebaTexto + confidences[i] + "\n";
-                if (confidences[i] > maxConfidence) {
-                    maxConfidence = confidences[i];
-                    maxPos = i;
-                    prueba.setText(pruebaTexto);
-
-                }
-                prueba.setText(pruebaTexto);
-            }
-
-            String[] classes =  {
-                    "Acaros",
-                    "Moho de hoja",
-                    "Moho polvoriento",
-                    "Plaga",
-                    "Puntos de hoja",//Puntos de hoja
-                    "Virus del tomate"
-            };
-            //----------------------------------
-            resultado.setText(classes[maxPos]);
-            //------------------------------
-
-            // Releases model resources if no longer used.
-            model.close();
-
-        } catch (IOException e) {
-            // TODO Handle the exception
-        }
-    }
-
     public void classifyImage3(Bitmap image){
         try {
             ModeloDetectorEnfermedadV10007 model = ModeloDetectorEnfermedadV10007.newInstance(getApplicationContext());
@@ -526,5 +634,5 @@ public class MainActivity extends AppCompatActivity {
             // TODO Handle the exception
         }
     }
-
+*/
 }

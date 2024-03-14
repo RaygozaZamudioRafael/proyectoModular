@@ -7,6 +7,40 @@
     android:background="@color/background"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/prueba2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ma_Imagen"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:text="Prueba:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.953"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ma_Imagen"
+        app:layout_constraintVertical_bias="0.395" />
+
+    <TextView
+        android:id="@+id/ma_resultado2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/classified"
+        android:layout_centerHorizontal="true"
+        android:text="."
+        android:textColor="#C30000"
+        android:textSize="27sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/classified"
+        app:layout_constraintVertical_bias="0.17" />
+
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar"
@@ -125,12 +159,29 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:id="@+id/prueba"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ma_Imagen"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:text="Prueba:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ma_Imagen"
+        app:layout_constraintVertical_bias="0.395" />
+
+    <TextView
         android:id="@+id/ma_resultado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/classified"
         android:layout_centerHorizontal="true"
-        android:text=""
+        android:text="."
         android:textColor="#C30000"
         android:textSize="27sp"
         android:textStyle="bold"
@@ -139,7 +190,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/classified"
-        app:layout_constraintVertical_bias="0.043" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textViewUsuario"

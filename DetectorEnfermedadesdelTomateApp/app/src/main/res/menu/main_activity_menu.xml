@@ -11,6 +11,10 @@
         android:title="Mapa epidemiologico"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/reportarEnfermedad"
+        android:title="Reportar Enfermedad"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/logOut"
         android:title="LogOut"
         app:showAsAction="never"/>

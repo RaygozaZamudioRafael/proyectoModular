@@ -8,9 +8,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,14 +28,24 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
+import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV10007;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -42,14 +55,23 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private int MY_PERMISSIONS_REQUEST;
+
+    private FusedLocationProviderClient fusedLocationClient;
+
     //Declaracion variables
     Button camara, galeria, descripcion, registro;
     ImageView imageView;
-    TextView resultado,username;
+    TextView resultado, resultado2, username, prueba, prueba2;
+
+    String idUsuario = "";
+    String pruebaTexto;
 
     UsuarioLocalAlmacenado mainActivityULA;
 
@@ -57,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     int TAMANIO_IMAGEN = 224;
-
 
 
     @Override
@@ -70,26 +91,28 @@ public class MainActivity extends AppCompatActivity {
 
         mainActivityULA = new UsuarioLocalAlmacenado(this);
 
-        camara  = findViewById(id.ma_Foto);
+        camara = findViewById(id.ma_Foto);
         galeria = findViewById(id.ma_Galeria);
         descripcion = findViewById(id.ma_BTNmostrarDescripcion);
         registro = findViewById(id.ma_AnalisisServidor);
+        prueba = findViewById(id.prueba);
+        prueba2 = findViewById(id.prueba2);
 
-        resultado   = findViewById(id.ma_resultado);
-        imageView   = findViewById(id.ma_Imagen);
-        username    = findViewById(id.textViewUsuario);
+        resultado = findViewById(id.ma_resultado);
+        resultado2 = findViewById(id.ma_resultado2);
+        imageView = findViewById(id.ma_Imagen);
+        username = findViewById(id.textViewUsuario);
 
-
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
         camara.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent,3);
-                }else {
+                    startActivityForResult(cameraIntent, 3);
+                } else {
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, 100);
                 }
             }
@@ -99,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                    Intent cameraIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(cameraIntent,1);
+                Intent cameraIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(cameraIntent, 1);
 
             }
         });
@@ -128,11 +151,10 @@ public class MainActivity extends AppCompatActivity {
         descripcion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(resultado.getText().equals("")){
+                if (resultado.getText().equals(".")) {
                     Toast.makeText(getApplicationContext(), "Se requiere analizar una foto primero", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Intent senderIntent = new Intent(getApplicationContext(),DescripcionEnfermedad.class);
+                } else {
+                    Intent senderIntent = new Intent(getApplicationContext(), DescripcionEnfermedad.class);
                     senderIntent.putExtra("KEY_SENDER", resultado.getText().toString());
                     startActivity(senderIntent);
                     //finish();
@@ -142,14 +164,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onStart() {
         super.onStart();
 
         obtenerPermisos();
 
-        if(autentificacion() == true){
+        if (autentificacion() == true) {
             Usuario usuario = mainActivityULA.getLoggInUser();
             username.setText(usuario.email);
 
@@ -163,8 +184,8 @@ public class MainActivity extends AppCompatActivity {
 
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    usuario.username = document.getId();
-                                    //usuario.username = document.getString("userName");
+                                    idUsuario = document.getId();
+                                    usuario.username = document.getString("userName");
                                     username.setText(usuario.username);
                                 }
 
@@ -175,9 +196,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-        }
-        else{
-            Intent intent = new Intent(getApplicationContext(),login.class);
+        } else {
+            Intent intent = new Intent(getApplicationContext(), login.class);
             startActivity(intent);
             finish();
         }
@@ -186,9 +206,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void obtenerPermisos() {
 
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
@@ -196,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private  boolean autentificacion(){
+    private boolean autentificacion() {
         return mainActivityULA.getAuthLogInUser();
     }
 
@@ -211,23 +231,69 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
-        if(id == R.id.objeto1){
-            Toast.makeText(this,"You clicked Opcion1",Toast.LENGTH_LONG).show();
+        if (id == R.id.objeto1) {
+            Toast.makeText(this, "You clicked Opcion1", Toast.LENGTH_LONG).show();
         } else if (id == R.id.mapaEpidemiologico) {
-            Toast.makeText(this,"You clicked mapaEpidemiologico",Toast.LENGTH_LONG).show();
-            Intent senderIntent = new Intent(getApplicationContext(),MapaEpidemiologico.class);
+            Toast.makeText(this, "You clicked mapaEpidemiologico", Toast.LENGTH_LONG).show();
+            Intent senderIntent = new Intent(getApplicationContext(), MapaEpidemiologico.class);
             startActivity(senderIntent);
+        } else if (id == R.id.reportarEnfermedad) {
+            Toast.makeText(this, "Subir reporte", Toast.LENGTH_LONG).show();
+            subirReporteEnfermedad();
         } else if (id == R.id.logOut) {
-            Toast.makeText(this,"You clicked LogOut",Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "You clicked LogOut", Toast.LENGTH_LONG).show();
             mainActivityULA.clearUserData();
-            Intent intent = new Intent(getApplicationContext(),login.class);
+            Intent intent = new Intent(getApplicationContext(), login.class);
             startActivity(intent);
             finish();
-        }
-        else{
+        } else {
 
         }
-            return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void subirReporteEnfermedad() {
+
+        Toast.makeText(getApplicationContext(), "Registro iniciado", Toast.LENGTH_SHORT).show();
+        Map<String, Object> map = new HashMap<>();
+        map.put("idUsuario", idUsuario);
+        map.put("idEnfermedad", "test");
+
+        map.put("fechaHora", FieldValue.serverTimestamp());
+
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //ArrayList<Double> latLong = new ArrayList<>();
+        GeoPoint latLong;
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        latLong = new GeoPoint(latitude,longitude);
+        map.put("latLon", latLong);
+        db.collection("registroEnfermedades").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(getApplicationContext(), "Enfermedad Registrada",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(),login.class);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Error al guardar",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
     //AGREGAR BOTON LOGOUT DENTRO DEL MENU Y RECORDAR LIMPIAR EL ALMACENAMIENTO LOCARL DEL USUARIO.
 
@@ -241,7 +307,8 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(image);
 
                 image = Bitmap.createScaledBitmap(image, TAMANIO_IMAGEN, TAMANIO_IMAGEN, true);
-                clasificarImagen(image);
+                classifyImage2(image);
+                classifyImage3(image);
             }else{
                 Uri dat = data.getData();
                 Bitmap image = null;
@@ -253,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
                 imageView.setImageBitmap(image);
 
                 image = Bitmap.createScaledBitmap(image, TAMANIO_IMAGEN, TAMANIO_IMAGEN, false);
-                clasificarImagen(image);
+                classifyImage2(image);
+                classifyImage3(image);
             }
         }
 
@@ -292,15 +360,17 @@ public class MainActivity extends AppCompatActivity {
             // Runs model inference and gets result.
             ModeloDetectorEnfermedadBinarioV10006.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
+            pruebaTexto = "Prueba: "+ "\n";
             float[] confidences = outputFeature0.getFloatArray();
             int maxPos = 0;
             float maxConfidence = 0;
             for (int i = 0; i < confidences.length; i++) {
+                pruebaTexto = pruebaTexto + confidences[i] + "\n";
                 if (confidences[i] > maxConfidence) {
                     maxConfidence = confidences[i];
                     maxPos = i;
                 }
+                prueba.setText(pruebaTexto);
             }
 
             String[] classes = {
@@ -310,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(classes[maxPos] == "Saludable"){
                 resultado.setText(classes[maxPos]);
+                classifyImage2(image);
             }
             else{
                 classifyImage2(image); //Esto es para una segunda clase cuando detecta la enfermedad
@@ -353,14 +424,21 @@ public class MainActivity extends AppCompatActivity {
             ModeloDetectorEnfermedadV320006.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
+            pruebaTexto = "Prueba: "+ "\n";
             float[] confidences = outputFeature0.getFloatArray();
             int maxPos = 0;
             float maxConfidence = 0;
+            float a,b;
+
             for (int i = 0; i < confidences.length; i++) {
+                pruebaTexto = pruebaTexto + confidences[i] + "\n";
                 if (confidences[i] > maxConfidence) {
                     maxConfidence = confidences[i];
                     maxPos = i;
+                    prueba.setText(pruebaTexto);
+
                 }
+                prueba.setText(pruebaTexto);
             }
 
             String[] classes =  {
@@ -368,11 +446,77 @@ public class MainActivity extends AppCompatActivity {
                     "Moho de hoja",
                     "Moho polvoriento",
                     "Plaga",
-                    "Moho de hoja",//Puntos de hoja
-                    "Virus_del_tomate"
+                    "Puntos de hoja",//Puntos de hoja
+                    "Virus del tomate"
             };
             //----------------------------------
             resultado.setText(classes[maxPos]);
+            //------------------------------
+
+            // Releases model resources if no longer used.
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+    }
+
+    public void classifyImage3(Bitmap image){
+        try {
+            ModeloDetectorEnfermedadV10007 model = ModeloDetectorEnfermedadV10007.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV10007.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+            pruebaTexto = "Prueba2: "+ "\n";
+            float[] confidences = outputFeature0.getFloatArray();
+            int maxPos = 0;
+            float maxConfidence = 0;
+            float a,b;
+
+            for (int i = 0; i < confidences.length; i++) {
+                pruebaTexto = pruebaTexto + confidences[i] + "\n";
+                if (confidences[i] > maxConfidence) {
+                    maxConfidence = confidences[i];
+                    maxPos = i;
+                    prueba2.setText(pruebaTexto);
+
+                }
+                prueba2.setText(pruebaTexto);
+            }
+
+            String[] classes =  {
+                    "Acaros",
+                    "Moho de hoja",
+                    "Moho polvoriento",
+                    "Plaga",
+                    "Puntos de hoja",//Puntos de hoja
+                    "Virus del tomate"
+            };
+            //----------------------------------
+            resultado2.setText(classes[maxPos]);
             //------------------------------
 
             // Releases model resources if no longer used.

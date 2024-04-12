@@ -1,12 +1,16 @@
 <resources>
-    <string name="app_name">DetectorEnfermedadesdelTomateApp</string>
+    <string name="app_name">\nDetector Enfermedades del Tomate App\n</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in">Iniciar Sesion</string>
+    <string name="registro_de_cuenta">Crear una cuenta</string>
+    <string name="texto_registro_usuario">Registro de Usuario</string>
+    <string name="texto_registro_usuario_btn">Registro</string>
+    <string name="texto_inicio_de_sesion">Iniciar Sesion</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="action_sign_up">Sign up</string>
     <string name="welcome">"Welcome !"</string>

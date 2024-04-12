@@ -3,7 +3,7 @@
 <layer-list android:opacity="opaque"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/background"></item>
+    <item android:drawable="@color/COLOR_PRINCIPAL_SOMBRA_SECUNDARIO"></item>
 
     <item>
         <bitmap android:src="@mipmap/ic_launcher"/>

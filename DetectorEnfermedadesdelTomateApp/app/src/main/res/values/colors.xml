@@ -9,4 +9,25 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="toolbarColor">#339900</color>
+
+    <!--    Cambio de paleta de colores tras revisión    -->
+
+    <color name="COLOR_PRINCIPAL_BASE">#45B516</color>
+    <color name="COLOR_PRINCIPAL_SOMBRA_PRINCIPAL">#2B8008</color>
+    <color name="COLOR_PRINCIPAL_SOMBRA_PRINCIPAL_TRANSPARENTE">#002B8008</color>
+    <color name="COLOR_PRINCIPAL_SOMBRA_SECUNDARIO">#103500</color>
+    <color name="COLOR_PRINCIPAL_CLARO_PRINCIPAL">#5AD825</color>
+    <color name="COLOR_PRINCIPAL_CLARO_SECUNDARIO">#79F147</color>
+    <color name="ERROR">#B51616</color>
+    <color name="EXITO">#1630B5</color>
+    <color name="NOTIFICACION_FONDO">#71D7DA</color>
+    <color name="TEXTO_PRINCIPAL">#000000</color>
+    <color name="TEXTO_PRINCIPAL_INVERSO">#FFFFFF</color>
+    <color name="TEXTO_SECUNDARIO">#111140</color>
+    <color name="FONDO_PRINCIPAL">#BCBFBA</color>
+    <color name="FONDO_SECUNDARIO">#989997</color>
+
+
+
+
 </resources>

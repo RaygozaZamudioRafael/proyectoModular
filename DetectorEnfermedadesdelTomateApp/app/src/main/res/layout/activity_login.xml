@@ -2,35 +2,45 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@drawable/bgl"
+>
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/input_group"
+        android:layout_width="371dp"
+        android:layout_height="292dp"
+        android:layout_above="@+id/input_group"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="25dp"
+        android:layout_marginTop="44dp"
         android:layout_marginRight="25dp"
+        android:layout_marginBottom="27dp"
         android:gravity="center"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/action_sign_in"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:text="@string/app_name"
+            android:textAlignment="center"
+            android:textColor="@color/TEXTO_PRINCIPAL_INVERSO"
+            android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowRadius="25"
+            android:textSize="30sp" />
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:layout_height="82dp"
+            android:text="@string/action_sign_in"
+            android:textColor="@color/TEXTO_PRINCIPAL_INVERSO"
+            android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowRadius="25"
+            android:textSize="42sp" />
+
 
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/input_group"
@@ -48,19 +58,25 @@
             android:id="@+id/login_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:hint="Email"
+            android:background="@color/FONDO_PRINCIPAL"
+            android:hint="Correo Electronico"
+            android:textColorHint="@color/TEXTO_PRINCIPAL"
+            android:textColor="@color/TEXTO_PRINCIPAL"
+            android:textSize="22dp"
             android:inputType="textPersonName"
-            android:padding="15dp" />
+            android:padding="24dp" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:hint="password"
+            android:background="@color/FONDO_PRINCIPAL"
+            android:hint="Contraseña"
+            android:textColorHint="@color/TEXTO_PRINCIPAL"
+            android:textColor="@color/TEXTO_PRINCIPAL"
+            android:textSize="22dp"
             android:inputType="textPassword"
-            android:padding="15dp" />
+            android:padding="24dp" />
 
 
         <Button
@@ -70,19 +86,21 @@
             android:layout_marginTop="10dp"
             android:text="@string/action_sign_in"
             android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="17sp" />
+            android:background="@color/FONDO_SECUNDARIO"
+            android:textColor="@color/TEXTO_PRINCIPAL"
+            android:textSize="24sp"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:id="@+id/signup_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
+            android:background="@color/NOTIFICACION_FONDO"
             android:padding="10dp"
-
-            android:text="no_account"
+            android:text="@string/registro_de_cuenta"
             android:textAllCaps="true"
-            android:textColor="#FAD0E1"
+            android:textColor="@color/TEXTO_SECUNDARIO"
             android:textSize="13sp"
             android:textStyle="bold" />
 

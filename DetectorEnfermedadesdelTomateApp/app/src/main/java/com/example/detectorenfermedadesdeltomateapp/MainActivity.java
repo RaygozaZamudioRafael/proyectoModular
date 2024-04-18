@@ -4,6 +4,7 @@ import static com.example.detectorenfermedadesdeltomateapp.R.*;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -33,6 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV10007;
@@ -49,6 +52,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -67,7 +73,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private int MY_PERMISSIONS_REQUEST;
 
@@ -87,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    FloatingActionButton fab;
+
+    private DrawerLayout drawerLayout;
 
     int TAMANIO_IMAGEN = 224;
 
@@ -94,10 +103,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layout.activity_main);
+        setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(id.toolbar);
-        setSupportActionBar(toolbar);
 
         mainActivityULA = new UsuarioLocalAlmacenado(this);
 
@@ -105,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
         galeria = findViewById(id.ma_Galeria);
         descripcion = findViewById(id.ma_BTNmostrarDescripcion);
         registro = findViewById(id.ma_AnalisisServidor);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
         //prueba = findViewById(id.prueba);
         //prueba2 = findViewById(id.prueba2);
 
@@ -114,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
         username = findViewById(id.textViewUsuario);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         camara.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         /*registro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -171,7 +181,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav,
+                R.string.close_nav);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        /*
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
+        }
+        */
     }
+
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 
 
     @Override
@@ -230,13 +265,14 @@ public class MainActivity extends AppCompatActivity {
         return mainActivityULA.getAuthLogInUser();
     }
 
+    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_activity_menu, menu);
-        return true;
-    }
-
+     public boolean onCreateOptionsMenu(Menu menu) {
+         MenuInflater inflater = getMenuInflater();
+         inflater.inflate(R.menu.main_activity_menu, menu);
+         return true;
+     }
+ */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
@@ -262,6 +298,40 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.mapaEpidemiologico) {
+            Toast.makeText(this, "Abriendo mapa epidemiologico", Toast.LENGTH_LONG).show();
+            Intent senderIntent = new Intent(getApplicationContext(), MapaEpidemiologico.class);
+            startActivity(senderIntent);
+        }
+        else if (id == R.id.reportarEnfermedad) {
+            Toast.makeText(this, "Enviando reporte", Toast.LENGTH_LONG).show();
+            //subirReporteEnfermedad();
+        }
+        else if(id == R.id.nav_logout){
+            Toast.makeText(this, "Saliendo de la cuenta", Toast.LENGTH_LONG).show();
+            mainActivityULA.clearUserData();
+            Intent intent = new Intent(getApplicationContext(), login.class);
+            startActivity(intent);
+            finish();
+        }
+        else if(id == R.id.nav_info_huerto_urbano) {
+            Toast.makeText(this, "Info Huertos urbanos", Toast.LENGTH_LONG).show();
+        }
+        else if(id == R.id.nav_guia_huerto_urbano) {
+            Toast.makeText(this, "Guia huertos urbanos", Toast.LENGTH_LONG).show();
+        }
+        else{
+
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
     private void subirReporteEnfermedad() {
         LocationCallback locationCallback = new LocationCallback() {
             @Override
@@ -283,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
             obtenerPermisos();
             return;
         }
+        Toast.makeText(getApplicationContext(), "RLU 310", Toast.LENGTH_SHORT).show();
         lm.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
                     @Override
@@ -298,14 +369,17 @@ public class MainActivity extends AppCompatActivity {
                     public void onLocationChanged(final Location location) {
                     }
                 });
-
+        Toast.makeText(getApplicationContext(), "RLU 326", Toast.LENGTH_SHORT).show();
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         //ArrayList<Double> latLong = new ArrayList<>();
         GeoPoint latLong;
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
         latLong = new GeoPoint(latitude,longitude);
-        map.put("latLon", latLong);
+        Toast.makeText(getApplicationContext(), "RLU pre map put", Toast.LENGTH_SHORT).show();
+
+        map.put("latLon", latLong.toString());
+        Toast.makeText(getApplicationContext(), "tras latlon map add", Toast.LENGTH_SHORT).show();
         db.collection("registroEnfermedades").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
 
             @Override

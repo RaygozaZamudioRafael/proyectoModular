@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -25,7 +26,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/fragment_container"
+            android:id="@+id/frame_layout"
             android:background="@color/FONDO_PRINCIPAL">
 
             <Button
@@ -52,17 +53,19 @@
 
             <Button
                 android:id="@+id/ma_BTNmostrarDescripcion"
-                android:layout_width="159dp"
-                android:layout_height="63dp"
+                android:layout_width="120dp"
+                android:layout_height="79dp"
+                android:layout_marginBottom="10dp"
                 android:layout_above="@id/ma_Galeria"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:background="@drawable/custom_button"
+                android:layout_gravity="bottom|center"
+                android:background="@drawable/minf_descripcion"
+                android:backgroundTint="@color/COLOR_PRINCIPAL_SOMBRA_PRINCIPAL"
                 android:shadowColor="#000000"
                 android:shadowRadius="25"
-                android:text="Descripción Enfermedad"
                 android:textAllCaps="false"
                 android:textColor="@color/TEXTO_PRINCIPAL_INVERSO"
                 android:textSize="18sp"
@@ -71,21 +74,22 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.974"
-                android:layout_gravity="bottom|center"
-                />
+                app:layout_constraintVertical_bias="0.974" />
 
             <Button
                 android:id="@+id/ma_Foto"
                 android:layout_width="wrap_content"
-                android:layout_height="62dp"
+                android:layout_height="83dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:background="@drawable/custom_button"
+                android:layout_gravity="bottom|left"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/minf_camara"
+                android:backgroundTint="@color/COLOR_PRINCIPAL_SOMBRA_PRINCIPAL"
                 android:shadowColor="#000000"
                 android:shadowRadius="25"
-                android:text="Foto"
                 android:textAllCaps="false"
                 android:textColor="@color/TEXTO_PRINCIPAL_INVERSO"
                 android:textSize="24sp"
@@ -95,33 +99,32 @@
                 app:layout_constraintHorizontal_bias="0.049"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.973"
-                android:layout_gravity="bottom|left"
-                />
+                app:layout_constraintVertical_bias="0.973" />
 
             <Button
                 android:id="@+id/ma_Galeria"
                 android:layout_width="wrap_content"
-                android:layout_height="62dp"
+                android:layout_height="83dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="20dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_centerInParent="true"
-                android:background="@drawable/custom_button"
-                android:text="Galeria"
-                android:textAllCaps="false"
-                android:textSize="21sp"
-                android:textStyle="bold"
-                android:textColor="@color/TEXTO_PRINCIPAL_INVERSO"
+                android:layout_gravity="bottom|right"
+                android:background="@drawable/minf_galeria"
+                android:backgroundTint="@color/COLOR_PRINCIPAL_SOMBRA_PRINCIPAL"
                 android:shadowColor="#000000"
                 android:shadowRadius="25"
+                android:textAllCaps="false"
+                android:textColor="@color/TEXTO_SECUNDARIO"
+                android:textSize="21sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.95"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.973"
-                android:layout_gravity="bottom|right"
-                />
+                app:layout_constraintVertical_bias="0.973" />
 
             <ImageView
                 android:id="@+id/ma_Imagen"
@@ -159,6 +162,72 @@
 
                 android:layout_gravity="center"
                 />
+
+            <TextView
+                android:id="@+id/textoBotonesCapturarFoto"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ma_Imagen"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom|left"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="80dp"
+                android:text="Capturar\n     foto"
+                android:textColor="@color/TEXTO_PRINCIPAL"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ma_Imagen"
+
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/textoBotonesDescripcionEnfermedad"
+                android:layout_width="118dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ma_Imagen"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom|center"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="80dp"
+                android:text="Descripcion\nenfermedad"
+                android:textColor="@color/TEXTO_PRINCIPAL"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ma_Imagen"
+
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/textoBotonesGaleria"
+                android:layout_width="78dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ma_Imagen"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="bottom|right"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="80dp"
+                android:text="Galeria"
+                android:textColor="@color/TEXTO_PRINCIPAL"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ma_Imagen"
+
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/ma_resultado"
@@ -202,8 +271,8 @@
 
         </FrameLayout>
 
-
     </LinearLayout>
+
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -213,4 +282,7 @@
         app:menu="@menu/nav_menu"
         app:itemIconTint="@color/COLOR_PRINCIPAL_BASE"
         app:itemTextColor="@color/TEXTO_SECUNDARIO"/>
+
+
+
 </androidx.drawerlayout.widget.DrawerLayout>

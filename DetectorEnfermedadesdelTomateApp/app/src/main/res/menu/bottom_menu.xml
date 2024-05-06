@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/camaraBM"
+        android:icon="@drawable/minf_camara"
+        android:title="Camara"
+        />
+    <item
+        android:id="@+id/descripcionEnfermedadBM"
+        android:title="Descripcion de la enfermedad"
+        android:icon="@drawable/minf_descripcion"
+        />
+    <item
+        android:id="@+id/galeriaBM"
+        android:title="Galeria"
+        android:icon="@drawable/minf_galeria"
+        />
+    <item
+        android:id="@+id/mapaEpidemiologicoBM"
+        android:title="Mapa epidemiologico"
+        android:icon="@drawable/nav_mapa_epidemiologico"
+        />
+</menu>

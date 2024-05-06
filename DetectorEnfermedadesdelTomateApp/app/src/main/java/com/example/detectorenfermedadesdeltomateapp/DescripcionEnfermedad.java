@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +29,7 @@ import java.util.Map;
 public class DescripcionEnfermedad extends AppCompatActivity {
 
     TextView nombreEnfermedad, descripcion, tratamiento;
-
+    Button cerrar;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     RequestQueue requestQueue;
     @Override
@@ -38,9 +40,25 @@ public class DescripcionEnfermedad extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_descripcion_enfermedad);
 
-        updateFB();
-        //updateInfo();
 
+        updateFB();
+
+        setButton();
+    }
+
+    public void setButton(){
+        cerrar = findViewById(R.id.returnMainActivityDescripcion);
+
+        cerrar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
+
+                Toast.makeText(getApplicationContext(), "Se requiere analizar una foto primero", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
     private void updateFB() {
@@ -78,6 +96,7 @@ public class DescripcionEnfermedad extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Error al recuperar datos", Toast.LENGTH_SHORT).show();
 
                         }
+                        Toast.makeText(getApplicationContext(), "salir del for", Toast.LENGTH_SHORT).show();
                     }
                 });
 

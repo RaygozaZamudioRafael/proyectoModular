@@ -25,6 +25,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".RiesgosHuertos"
+            android:exported="false" />
+        <activity
+            android:name=".TipsHuerto"
+            android:exported="false" />
+        <activity
             android:name=".InfoHuertos"
             android:exported="false" />
         <!--
@@ -46,18 +52,25 @@
             android:name=".MapaEpidemiologico"
             android:exported="false"
             android:label="@string/title_activity_mapa_epidemiologico" />
+
         <activity
             android:name=".DescripcionEnfermedad"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".signup"
-            android:exported="true" />
+            android:exported="true"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".login"
-            android:exported="true"></activity>
+            android:exported="true"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -67,7 +80,8 @@
         <activity
             android:name=".SplashActivity"
             android:exported="false"
-            android:theme="@style/Theme.Design.Light"></activity>
+            android:theme="@style/Theme.Design.Light"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

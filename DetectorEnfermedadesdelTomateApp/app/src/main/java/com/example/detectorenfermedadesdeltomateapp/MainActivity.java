@@ -264,48 +264,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean autentificacion() {
         return mainActivityULA.getAuthLogInUser();
     }
-
-    /*
-    @Override
-     public boolean onCreateOptionsMenu(Menu menu) {
-         MenuInflater inflater = getMenuInflater();
-         inflater.inflate(R.menu.main_activity_menu, menu);
-         return true;
-     }
- */
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        int id = item.getItemId();
-        if (id == R.id.objeto1) {
-            Toast.makeText(this, "You clicked Opcion1", Toast.LENGTH_LONG).show();
-        } else if (id == R.id.mapaEpidemiologico) {
-            Toast.makeText(this, "You clicked mapaEpidemiologico", Toast.LENGTH_LONG).show();
-            Intent senderIntent = new Intent(getApplicationContext(), MapaEpidemiologico.class);
-            startActivity(senderIntent);
-        } else if (id == R.id.reportarEnfermedad) {
-            Toast.makeText(this, "Subir reporte", Toast.LENGTH_LONG).show();
-            subirReporteEnfermedad();
-        } else if (id == R.id.logOut) {
-            Toast.makeText(this, "You clicked LogOut", Toast.LENGTH_LONG).show();
-            mainActivityULA.clearUserData();
-            Intent intent = new Intent(getApplicationContext(), login.class);
-            startActivity(intent);
-            finish();
-        } else {
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         int id = item.getItemId();
 
         if (id == R.id.mapaEpidemiologico) {
             Toast.makeText(this, "Abriendo mapa epidemiologico", Toast.LENGTH_LONG).show();
-            Intent senderIntent = new Intent(getApplicationContext(), MapaEpidemiologico.class);
-            startActivity(senderIntent);
+            Intent Intent = new Intent(getApplicationContext(), MapaEpidemiologico.class);
+            startActivity(Intent);
         }
         else if (id == R.id.reportarEnfermedad) {
             Toast.makeText(this, "Enviando reporte", Toast.LENGTH_LONG).show();
@@ -320,9 +286,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else if(id == R.id.nav_info_huerto_urbano) {
             Toast.makeText(this, "Info Huertos urbanos", Toast.LENGTH_LONG).show();
+            Intent Intent = new Intent(getApplicationContext(), InfoHuertos.class);
+            startActivity(Intent);
+        }
+        else if(id == R.id.nav_riesgos_huerto_urbano) {
+            Toast.makeText(this, "Riesgos de huertos urbanos", Toast.LENGTH_LONG).show();
+            Intent Intent = new Intent(getApplicationContext(), RiesgosHuertos.class);
+            startActivity(Intent);
         }
         else if(id == R.id.nav_guia_huerto_urbano) {
             Toast.makeText(this, "Guia huertos urbanos", Toast.LENGTH_LONG).show();
+            Intent Intent = new Intent(getApplicationContext(), TipsHuerto.class);
+            startActivity(Intent);
+        }
+        else if(id == R.id.nav_app_tutorial) {
+            Toast.makeText(this, "Abrir tutorial", Toast.LENGTH_LONG).show();
+
         }
         else{
 
@@ -385,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Toast.makeText(getApplicationContext(), "Enfermedad Registrada",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getApplicationContext(),login.class);
+                //Intent intent = new Intent(getApplicationContext(),login.class);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -549,7 +528,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Sumar las confidencias para sacar la media
 
         for (int i = 0; i < confidences0.length; i++) {
-            confidences0[i] = confidences0[i] + confidences1[i] + confidences2[i];
+            //confidences0[i] = confidences0[i] + confidences1[i] + confidences2[i];
+            confidences0[i] = confidences2[i];
         }
 
         //sacar mayor confidencia y comparar el resultado

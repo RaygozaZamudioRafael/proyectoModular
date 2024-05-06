@@ -14,23 +14,26 @@ import com.denzcoskun.imageslider.models.SlideModel;
 
 import java.util.ArrayList;
 
-public class InfoHuertos extends AppCompatActivity {
+public class TipsHuerto extends AppCompatActivity {
     Button cerrarVentana;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_info_huertos);
-        cerrarVentana = findViewById(R.id.returnMainActivityInfoHuerto);
+        setContentView(R.layout.activity_tips_huerto);
+        cerrarVentana = findViewById(R.id.returnMainActivityTipsHuerto);
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ImageSlider imageSlider = findViewById(R.id.imageSlider);
         ArrayList<SlideModel> slideModels = new ArrayList<>();
 
-        slideModels.add(new SlideModel(R.drawable.infohuertourbano1, ScaleTypes.FIT));
-        slideModels.add(new SlideModel(R.drawable.infohuertourbano2, ScaleTypes.FIT));
-        slideModels.add(new SlideModel(R.drawable.infohuertourbano3, ScaleTypes.FIT));
-        slideModels.add(new SlideModel(R.drawable.infohuertourbano4, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos1, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos2, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos3, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos4, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos5, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos6, ScaleTypes.FIT));
+        slideModels.add(new SlideModel(R.drawable.tipshuertos7, ScaleTypes.FIT));
 
         imageSlider.setImageList(slideModels,ScaleTypes.FIT);
 

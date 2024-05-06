@@ -13,7 +13,7 @@
 
     <style name="Theme.DetectorEnfermedadesdelTomateApp.Fullscreen" parent="Theme.DetectorEnfermedadesdelTomateApp">
         <item name="android:actionBarStyle">
-            @style/Widget.Theme.DetectorEnfermedadesdelTomateApp.ActionBar.Fullscreen
+            @style/Widget.Theme.DetectorEnfermedadesdelTomateApp.ActionBar
         </item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowBackground">@null</item>

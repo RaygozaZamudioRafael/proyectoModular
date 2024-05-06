@@ -80,7 +80,7 @@ private ActivityMapaEpidemiologicoBinding binding;
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 GeoPoint point = document.getGeoPoint("latLon");
                                 marcador = new LatLng(point.getLatitude(), point.getLongitude());
-                                mMap.addMarker(new MarkerOptions().position(marcador).title(document.getId()));
+                                mMap.addMarker(new MarkerOptions().position(marcador).title(document.getString("idEnfermedad")));
 
                             }
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marcador,15));

@@ -1,22 +1,31 @@
 package com.example.detectorenfermedadesdeltomateapp;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.example.detectorenfermedadesdeltomateapp.R.*;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationRequest;
+import java.util.Locale;
+import android.os.CountDownTimer;
+import android.provider.Settings;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -71,9 +80,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private int MY_PERMISSIONS_REQUEST;
 
@@ -95,8 +106,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     FloatingActionButton fab;
 
+    Location locationActual = null;
+
+    private LocationManager locationManager;
+
+
+    private MyLocationListener mylistener;
+
+    private String provider;
+
+    private Criteria criteria;
+
     private DrawerLayout drawerLayout;
 
+    Location location = null;
     int TAMANIO_IMAGEN = 224;
 
 
@@ -126,6 +149,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         username = findViewById(id.textViewUsuario);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+//---------------------------------------------------------------------------------------------------------------------------
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);   //default
+        criteria.setCostAllowed(false);
+
+        provider = LocationManager.GPS_PROVIDER;
+
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST);
+        }
+
+
+
+        mylistener = new MyLocationListener();
+
+//---------------------------------------------------------------------------------------------------------------------------
 
         camara.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +243,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         */
     }
 
+    private void callLocationListener() {
+
+
+
+
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -251,11 +304,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void obtenerPermisos() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
         }
 
@@ -275,7 +328,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else if (id == R.id.reportarEnfermedad) {
             Toast.makeText(this, "Enviando reporte", Toast.LENGTH_LONG).show();
-            //subirReporteEnfermedad();
+           // resultado.setText("calculando coordenadas");
+            subirReporteEnfermedad();
         }
         else if(id == R.id.nav_logout){
             Toast.makeText(this, "Saliendo de la cuenta", Toast.LENGTH_LONG).show();
@@ -311,71 +365,67 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @SuppressLint("MissingPermission")
     private void subirReporteEnfermedad() {
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(@NonNull LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                Log.d("demo","onLocationResult: " + locationResult);
-            }
-        };
 
         Toast.makeText(getApplicationContext(), "Registro iniciado", Toast.LENGTH_SHORT).show();
+
         Map<String, Object> map = new HashMap<>();
         map.put("idUsuario", idUsuario);
-        map.put("idEnfermedad", "test");
-
+        map.put("idEnfermedad", resultado.getText());
         map.put("fechaHora", FieldValue.serverTimestamp());
 
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            obtenerPermisos();
-            return;
-        }
-        Toast.makeText(getApplicationContext(), "RLU 310", Toast.LENGTH_SHORT).show();
-        lm.requestLocationUpdates(
-                LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+        locationManager.requestLocationUpdates(provider, 200, 1, mylistener);
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Obteniendo ubicación ...");
+        alertDialog.setMessage("00:08");
+        alertDialog.show();
+
+        new CountDownTimer(8000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                alertDialog.setMessage("00:" + (millisUntilFinished / 1000));
+            }
+
+            @Override
+            public void onFinish() {
+
+                location = locationManager.getLastKnownLocation(provider);
+
+                GeoPoint latLong;
+                double longitude = location.getLongitude();
+                double latitude = location.getLatitude();
+
+                //resultado.setText(String.valueOf(lat)+","+String.valueOf(lon));
+                latLong = new GeoPoint(latitude,longitude);
+                map.put("latLon", latLong);
+
+
+                locationManager.removeUpdates(mylistener);
+
+                db.collection("registroEnfermedades").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+
                     @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(getApplicationContext(), "Enfermedad Registrada",Toast.LENGTH_SHORT).show();
+                        //Intent intent = new Intent(getApplicationContext(),login.class);
                     }
+                }).addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onProviderEnabled(String provider) {
-                    }
-                    @Override
-                    public void onProviderDisabled(String provider) {
-                    }
-                    @Override
-                    public void onLocationChanged(final Location location) {
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error al guardar",Toast.LENGTH_SHORT).show();
                     }
                 });
-        Toast.makeText(getApplicationContext(), "RLU 326", Toast.LENGTH_SHORT).show();
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        //ArrayList<Double> latLong = new ArrayList<>();
-        GeoPoint latLong;
-        double longitude = location.getLongitude();
-        double latitude = location.getLatitude();
-        latLong = new GeoPoint(latitude,longitude);
-        Toast.makeText(getApplicationContext(), "RLU pre map put", Toast.LENGTH_SHORT).show();
 
-        map.put("latLon", latLong.toString());
-        Toast.makeText(getApplicationContext(), "tras latlon map add", Toast.LENGTH_SHORT).show();
-        db.collection("registroEnfermedades").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
 
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(getApplicationContext(), "Enfermedad Registrada",Toast.LENGTH_SHORT).show();
-                //Intent intent = new Intent(getApplicationContext(),login.class);
+                alertDialog.dismiss();
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Error al guardar",Toast.LENGTH_SHORT).show();
-            }
-        });
+        }.start();
+
 
 
     }
-    //AGREGAR BOTON LOGOUT DENTRO DEL MENU Y RECORDAR LIMPIAR EL ALMACENAMIENTO LOCARL DEL USUARIO.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -689,4 +739,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 */
+private class MyLocationListener implements LocationListener {
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Toast.makeText(MainActivity.this, "" + location.getLatitude() + location.getLongitude(),
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Toast.makeText(MainActivity.this, provider + "'s status changed to " + status + "!",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Toast.makeText(MainActivity.this, "Provider " + provider + " enabled!",
+                Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(MainActivity.this, "Provider " + provider + " disabled!",
+                Toast.LENGTH_SHORT).show();
+    }
 }
+
+}
+

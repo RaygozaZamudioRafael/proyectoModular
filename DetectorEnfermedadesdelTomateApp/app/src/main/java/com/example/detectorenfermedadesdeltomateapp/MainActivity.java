@@ -48,7 +48,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadBinarioV10006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV10007;
+import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV20007;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV320006;
+import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV330006;
 import com.example.detectorenfermedadesdeltomateapp.ml.ModeloDetectorEnfermedadV60007;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Granularity;
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     TextView resultado, resultado2, username, prueba, prueba2;
 
     String idUsuario = "";
-    String pruebaTexto;
+    String resultadoActual;
 
     UsuarioLocalAlmacenado mainActivityULA;
 
@@ -107,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FloatingActionButton fab;
 
     Location locationActual = null;
+
+    Boolean puedeReportar = false;
 
     private LocationManager locationManager;
 
@@ -149,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         username = findViewById(id.textViewUsuario);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        resultadoActual = resultado.getText().toString();
 
 //---------------------------------------------------------------------------------------------------------------------------
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -327,9 +333,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(Intent);
         }
         else if (id == R.id.reportarEnfermedad) {
-            Toast.makeText(this, "Enviando reporte", Toast.LENGTH_LONG).show();
-           // resultado.setText("calculando coordenadas");
-            subirReporteEnfermedad();
+            String resultadoReportado = resultado.getText().toString();
+            if(puedeReportar){
+                Toast.makeText(this, "Enviando reporte", Toast.LENGTH_LONG).show();
+                // resultado.setText("calculando coordenadas");
+                subirReporteEnfermedad();
+                puedeReportar = false;
+            }
+            else if(resultadoReportado != resultadoActual){
+                Toast.makeText(this, "Imagen actual ya reportada", Toast.LENGTH_LONG).show();
+            }
+            else{
+                Toast.makeText(this, "Debe analizar una imagen primero", Toast.LENGTH_LONG).show();
+            }
+
         }
         else if(id == R.id.nav_logout){
             Toast.makeText(this, "Saliendo de la cuenta", Toast.LENGTH_LONG).show();
@@ -355,7 +372,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         else if(id == R.id.nav_app_tutorial) {
             Toast.makeText(this, "Abrir tutorial", Toast.LENGTH_LONG).show();
-
+            Intent intent = new Intent(MainActivity.this, NavigarionActivity.class);
+            startActivity(intent);
+            finish();
         }
         else{
 
@@ -462,13 +481,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void clasificarImagenEnsamble(Bitmap image){
 
-        float[] confidences0 = new float[6],confidences1 = new float[6],confidences2 = new float[6];
+        float[] confidences0 = new float[6],confidences1 = new float[6],confidences2 = new float[6],confidences3 = new float[6],confidences4 = new float[6],resultadoConfidencia = new float[6];
         int maxPos = 0;
         float maxConfidence = 0;
 
         try {
             ModeloDetectorEnfermedadV320006 model = ModeloDetectorEnfermedadV320006.newInstance(getApplicationContext());
-            ModeloDetectorEnfermedadV60007 model3 = ModeloDetectorEnfermedadV60007.newInstance(getApplicationContext());
+            //ModeloDetectorEnfermedadV60007 model3 = ModeloDetectorEnfermedadV60007.newInstance(getApplicationContext());
 
             // Creates inputs for reference.
             TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
@@ -575,23 +594,152 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // TODO Handle the exception
         }
 
+        try {
+            ModeloDetectorEnfermedadV330006 model = ModeloDetectorEnfermedadV330006.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV330006.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+            confidences3 = outputFeature0.getFloatArray();
+
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+
+        try {
+            ModeloDetectorEnfermedadV20007 model = ModeloDetectorEnfermedadV20007.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.FLOAT32);
+
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4*TAMANIO_IMAGEN*TAMANIO_IMAGEN*3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int[] intValues = new int[TAMANIO_IMAGEN * TAMANIO_IMAGEN];
+            image.getPixels(intValues,0, image.getWidth(),0,0,image.getWidth(),image.getHeight());
+            int pixel = 0;
+
+            for(int i = 0; i<TAMANIO_IMAGEN; i++){
+                for(int j = 0; j< TAMANIO_IMAGEN; j++){
+                    int val = intValues[pixel++]; // RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 1));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 1));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModeloDetectorEnfermedadV20007.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+            confidences4 = outputFeature0.getFloatArray();
+
+            model.close();
+
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+
+
+
+
         //Sumar las confidencias para sacar la media
 
-        for (int i = 0; i < confidences0.length; i++) {
+        for (int i = 0; i < resultadoConfidencia.length; i++) {
             //confidences0[i] = confidences0[i] + confidences1[i] + confidences2[i];
-            confidences0[i] = confidences2[i];
+            //confidences0[i] = confidences2[i];
+            resultadoConfidencia[i] = 0;
         }
 
         //sacar mayor confidencia y comparar el resultado
+        maxConfidence = 0;
+        maxPos = 0;
         for (int i = 0; i < confidences0.length; i++) {
-            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
             if (confidences0[i] > maxConfidence) {
                 maxConfidence = confidences0[i];
                 maxPos = i;
-                //prueba.setText(pruebaTexto);
             }
-            //prueba.setText(pruebaTexto);
         }
+        resultadoConfidencia[maxPos] +=1;
+        maxConfidence = 0;
+        maxPos = 0;
+        for (int i = 0; i < confidences1.length; i++) {
+            if (confidences1[i] > maxConfidence) {
+                maxConfidence = confidences1[i];
+                maxPos = i;
+            }
+        }
+
+        resultadoConfidencia[maxPos] +=1;
+        maxConfidence = 0;
+        maxPos = 0;
+        for (int i = 0; i < confidences2.length; i++) {
+            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
+            if (confidences2[i] > maxConfidence) {
+                maxConfidence = confidences2[i];
+                maxPos = i;
+            }
+        }
+
+        resultadoConfidencia[maxPos] +=1;
+        maxConfidence = 0;
+        maxPos = 0;
+        for (int i = 0; i < confidences3.length; i++) {
+            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
+            if (confidences3[i] > maxConfidence) {
+                maxConfidence = confidences3[i];
+                maxPos = i;
+            }
+        }
+
+        resultadoConfidencia[maxPos] +=1;
+        maxConfidence = 0;
+        maxPos = 0;
+        for (int i = 0; i < confidences4.length; i++) {
+            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
+            if (confidences4[i] > maxConfidence) {
+                maxConfidence = confidences4[i];
+                maxPos = i;
+            }
+        }
+
+        resultadoConfidencia[maxPos] +=1;
+        maxConfidence = 0;
+        maxPos = 0;
+        for (int i = 0; i < resultadoConfidencia.length; i++) {
+            //pruebaTexto = pruebaTexto + confidences[i] + "\n";
+            if (resultadoConfidencia[i] > maxConfidence) {
+                maxConfidence = resultadoConfidencia[i];
+                maxPos = i;
+            }
+        }
+
         String[] classes =  {
                 "Acaros",
                 "Moho de hoja",
@@ -602,6 +750,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         //----------------------------------
         resultado.setText(classes[maxPos]);
+        puedeReportar = true;
         //------------------------------
     }
 /*

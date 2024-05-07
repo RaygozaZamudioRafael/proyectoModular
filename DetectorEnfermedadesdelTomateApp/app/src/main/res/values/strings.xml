@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">\nDetector Enfermedades del Tomate App\n</string>
+    <string name="app_name">Garden Watch</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Iniciar Sesion</string>
+    <string name="action_sign_in">Iniciar Sesión</string>
     <string name="registro_de_cuenta">Crear una cuenta</string>
     <string name="texto_registro_usuario">Registro de Usuario</string>
     <string name="texto_registro_usuario_btn">Registro</string>
@@ -19,6 +19,16 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_mapa_epidemiologico">MapaEpidemiologico</string>
+
+
+    <string name="screen1">"titulo1"</string>
+    <string name="screen2">"titulo1"</string>
+    <string name="screen3">"titulo1"</string>
+
+    <string name="screen1desc">"titulo1"</string>
+    <string name="screen2desc">"titulo1"</string>
+    <string name="screen3desc">"titulo1"</string>
+
 
     <string name="open_nav">Open Navigation Drawer</string>
     <string name="close_nav">Close Navigation Drawer</string>
